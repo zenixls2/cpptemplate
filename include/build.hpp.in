@@ -1,0 +1,19 @@
+#pragma once
+
+namespace build {
+char const* project_name() {
+    return "@PROJECT_NAME@";
+}
+char const* project_version() {
+    return "@PROJECT_VERSION@";
+}
+char const* cmake_build_type() {
+    return "@CMAKE_BUILD_TYPE@";
+}
+char const* build_time() {
+    return "@BUILD_TIME_STRING@";
+}
+char const* build_platform() {
+    return "@LINUX_NAME@ @LINUX_VERSION@";
+}
+} // namespace build
