@@ -1,16 +1,20 @@
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/spdlog.h>
 #include <build.hpp>
+#include <exception>
+#include <csignal>
+#include <iostream>
 #include <cstdlib>
 
 std::shared_ptr<spdlog::logger> logger;
 
-void signal_handler(int signal) {
+void signal_handler([[gnu::unused]] int signal) {
     if (logger) logger->flush();
 }
 
 int main(int argc, char* argv[]) {
     try {
+        int c;
         while((c=getopt(argc, argv, "hv")) != -1) {
             switch(c) {
                 case 'h':
@@ -28,12 +32,12 @@ int main(int argc, char* argv[]) {
                     break;
             }
         }
-        auto console = std::make_shared<spdlog::sinks::stdout_sink_st>();
+        auto console = std::make_shared<spdlog::sinks::ansicolor_stdout_sink_st>();
         console->set_level(spdlog::level::info);
         logger = std::make_shared<spdlog::logger>(build::project_name(), console);
         logger->info("Application name: {}", build::project_name());
         logger->info("Application version: {}", build::project_version());
-        logger->info("Build type: {}", build::make_build_type());
+        logger->info("Build type: {}", build::cmake_build_type());
         logger->info("Build time: {}", build::build_time());
         logger->info("Build platform: {}", build::build_platform());
         std::signal(SIGINT, signal_handler);

@@ -1,5 +1,10 @@
 #pragma once
-
+#pragma push_macro("__STR")
+#pragma push_macro("STR")
+#undef __STR
+#undef STR
+#define __STR(a) #a
+#define STR(a) __STR(a)
 namespace build {
 char const* project_name() {
     return "@PROJECT_NAME@";
@@ -14,6 +19,20 @@ char const* build_time() {
     return "@BUILD_TIME_STRING@";
 }
 char const* build_platform() {
-    return "@LINUX_NAME@ @LINUX_VERSION@";
+#ifdef __GNUC__
+    return "@LINUX_NAME@ @LINUX_VERSION@ gcc " __VERSION__;
+#elif defined(__clang__)
+    return "@LINUX_NAME@ @LINUX_VERSION@ clang " STR(__clang_major__) "."
+        STR(__clang_minor__) "." STR(__clang_patchlevel__);
+#elif defined(__MINGW64__)
+    return "@LINUX_NAME@ @LINUX_VERSION@ mingw " STR(__MINGW_MAJOR_VERSION) "." 
+        STR(__MINGW_MINOR_VERSION);
+#elif defined(_MSC_VER)
+    return "@LINUX_NAME@ @LINUX_VERSION@ virtual studio " STR(_MSC_FULL_VER);
+#else
+    return "@LINUX_NAME@ @LINUX_VERSION@ unknown compiler";
+#endif
 }
 } // namespace build
+#pragma pop_macro("__STR")
+#pragma pop_macro("STR")
